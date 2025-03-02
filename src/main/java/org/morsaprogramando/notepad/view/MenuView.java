@@ -1,7 +1,6 @@
 package org.morsaprogramando.notepad.view;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.function.Consumer;
 
@@ -13,9 +12,12 @@ public class MenuView {
     private final JMenuItem exitItem;
 
     private final Consumer<File> fileConsumer;
+    private final Runnable saveRunnable;
 
-    public MenuView(Consumer<File> fileConsumer) {
+    public MenuView(Consumer<File> fileConsumer, Runnable saveRunnable) {
         this.fileConsumer = fileConsumer;
+        this.saveRunnable = saveRunnable;
+
         menuBar = new JMenuBar();
 
         JMenu fileMenu = new JMenu("File");
@@ -36,58 +38,26 @@ public class MenuView {
         initMenuItems();
     }
 
-    /**
-     * Returns the JMenuBar for integration into the main application frame.
-     *
-     * @return The menu bar component.
-     */
     public JMenuBar getMenuBar() {
         return menuBar;
     }
 
-    public void addOpenListener(ActionListener listener) {
-        openItem.addActionListener(listener);
-    }
-
-    /**
-     * @param listener The action listener.
-     */
-    public void addSaveListener(ActionListener listener) {
-        saveItem.addActionListener(listener);
-    }
-
-    /**
-     * @param listener The action listener.
-     */
-    public void addSaveAsListener(ActionListener listener) {
-        saveAsItem.addActionListener(listener);
-    }
-
-    /**
-     * @param listener The action listener.
-     */
-    public void addExitListener(ActionListener listener) {
-        exitItem.addActionListener(listener);
-    }
-
-    // Method to open a file dialog and return the selected file
     private File openFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text files (*.txt)", "txt"));
 
         int result = fileChooser.showOpenDialog(null);
+
         if (result == JFileChooser.APPROVE_OPTION) {
-            return fileChooser.getSelectedFile();  // Return the File object
+            return fileChooser.getSelectedFile();
         }
-        return null;  // Return null if no file was selected
+
+        return null;
     }
 
     private void initMenuItems() {
         openItem.addActionListener(e -> {
             File file = openFile();
-
-            // idea: here we could have a consumer passed from the parent component
-            // which we will feed this file to the upper logic can read its content
 
             if (file != null) {
                 System.out.println("Selected file: " + file.getAbsolutePath());
@@ -97,5 +67,9 @@ public class MenuView {
                 System.out.println("No file selected");
             }
         });
+
+        saveItem.addActionListener(e -> saveRunnable.run());
+
+        exitItem.addActionListener(e -> System.exit(0));
     }
 }

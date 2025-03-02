@@ -1,9 +1,7 @@
 package org.morsaprogramando.notepad.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Objects;
 
 public class FileService {
 
@@ -18,5 +16,14 @@ public class FileService {
             }
         }
         return content.toString();
+    }
+
+    public void saveFile(File file, String content) throws IOException {
+        Objects.requireNonNull(file, "no file provided");
+        Objects.requireNonNull(content, "no content provided");
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(content);
+        }
     }
 }

@@ -25,7 +25,7 @@ public class TextEditorView {
      *
      * @return JScrollPane with the text editor.
      */
-    public JScrollPane getEditorComponent() {
+    public JScrollPane getScrollPane() {
         return scrollPane;
     }
 

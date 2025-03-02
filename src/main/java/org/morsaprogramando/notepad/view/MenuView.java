@@ -2,17 +2,20 @@ package org.morsaprogramando.notepad.view;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-public class MenuView {
-    /**
-     * Represents the menu bar for the Notepad app.
-     */
-    private JMenuBar menuBar;
-    private JMenuItem openItem, saveItem, saveAsItem, exitItem;
+import java.io.File;
+import java.util.function.Consumer;
 
-    /**
-     * Constructs the MenuView and initializes the menu items.
-     */
-    public MenuView() {
+public class MenuView {
+    private JMenuBar menuBar;
+    private final JMenuItem openItem;
+    private final JMenuItem saveItem;
+    private final JMenuItem saveAsItem;
+    private final JMenuItem exitItem;
+
+    private final Consumer<File> fileConsumer;
+
+    public MenuView(Consumer<File> fileConsumer) {
+        this.fileConsumer = fileConsumer;
         menuBar = new JMenuBar();
 
         JMenu fileMenu = new JMenu("File");
@@ -29,6 +32,8 @@ public class MenuView {
         fileMenu.add(exitItem);
 
         menuBar.add(fileMenu);
+
+        initMenuItems();
     }
 
     /**
@@ -40,18 +45,11 @@ public class MenuView {
         return menuBar;
     }
 
-    /**
-     * Adds an action listener to the Open menu item.
-     *
-     * @param listener The action listener.
-     */
     public void addOpenListener(ActionListener listener) {
         openItem.addActionListener(listener);
     }
 
     /**
-     * Adds an action listener to the Save menu item.
-     *
      * @param listener The action listener.
      */
     public void addSaveListener(ActionListener listener) {
@@ -59,8 +57,6 @@ public class MenuView {
     }
 
     /**
-     * Adds an action listener to the Save As menu item.
-     *
      * @param listener The action listener.
      */
     public void addSaveAsListener(ActionListener listener) {
@@ -68,11 +64,38 @@ public class MenuView {
     }
 
     /**
-     * Adds an action listener to the Exit menu item.
-     *
      * @param listener The action listener.
      */
     public void addExitListener(ActionListener listener) {
         exitItem.addActionListener(listener);
+    }
+
+    // Method to open a file dialog and return the selected file
+    private File openFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text files (*.txt)", "txt"));
+
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();  // Return the File object
+        }
+        return null;  // Return null if no file was selected
+    }
+
+    private void initMenuItems() {
+        openItem.addActionListener(e -> {
+            File file = openFile();
+
+            // idea: here we could have a consumer passed from the parent component
+            // which we will feed this file to the upper logic can read its content
+
+            if (file != null) {
+                System.out.println("Selected file: " + file.getAbsolutePath());
+
+                fileConsumer.accept(file);
+            } else {
+                System.out.println("No file selected");
+            }
+        });
     }
 }

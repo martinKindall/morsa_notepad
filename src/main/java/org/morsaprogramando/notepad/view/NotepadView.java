@@ -2,6 +2,7 @@ package org.morsaprogramando.notepad.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class NotepadView {
     private JFrame frame;
@@ -12,7 +13,8 @@ public class NotepadView {
         // Initialize the components
         frame = new JFrame("Notepad");
         textEditorView = new TextEditorView();
-        menuView = new MenuView();
+
+        menuView = new MenuView((File file) -> {});
 
         // Set the frame layout
         frame.setLayout(new BorderLayout());
@@ -21,7 +23,7 @@ public class NotepadView {
         frame.setJMenuBar(menuView.getMenuBar());
 
         // Add the text editor to the center (scrollPane is part of textEditorView)
-        frame.add(textEditorView.getEditorComponent(), BorderLayout.CENTER);
+        frame.add(textEditorView.getScrollPane(), BorderLayout.CENTER);
 
         // Set default close operation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -1,7 +1,9 @@
 package org.morsaprogramando.notepad.view;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.io.IOException;
 import java.util.function.Consumer;
 
 public class MenuView {
@@ -11,12 +13,15 @@ public class MenuView {
     private final JMenuItem saveAsItem;
     private final JMenuItem exitItem;
 
-    private final Consumer<File> fileConsumer;
+    private final Consumer<File> openFileConsumer;
     private final Runnable saveRunnable;
+    private final Consumer<File> saveAsFileConsumer;
 
-    public MenuView(Consumer<File> fileConsumer, Runnable saveRunnable) {
-        this.fileConsumer = fileConsumer;
+    public MenuView(Consumer<File> openFileConsumer, Runnable saveRunnable, Consumer<File> saveAsFileConsumer) {
+        this.openFileConsumer = openFileConsumer;
         this.saveRunnable = saveRunnable;
+        this.saveAsFileConsumer = saveAsFileConsumer;
+
 
         menuBar = new JMenuBar();
 
@@ -55,6 +60,32 @@ public class MenuView {
         return null;
     }
 
+    public File saveFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Text files (*.txt)", "txt"));
+
+        int result = fileChooser.showSaveDialog(null);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+
+            // Ensure the file has a .txt extension
+            if (!selectedFile.getName().toLowerCase().endsWith(".txt")) {
+                selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
+            }
+
+            try {
+                if (selectedFile.createNewFile() || selectedFile.exists()) {
+                    return selectedFile;
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error creating file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        return null;
+    }
+
     private void initMenuItems() {
         openItem.addActionListener(e -> {
             File file = openFile();
@@ -62,13 +93,25 @@ public class MenuView {
             if (file != null) {
                 System.out.println("Selected file: " + file.getAbsolutePath());
 
-                fileConsumer.accept(file);
+                openFileConsumer.accept(file);
             } else {
                 System.out.println("No file selected");
             }
         });
 
         saveItem.addActionListener(e -> saveRunnable.run());
+
+        saveAsItem.addActionListener(e -> {
+            File file = saveFile();
+
+            if (file != null) {
+                System.out.println("Selected file for saving: " + file.getAbsolutePath());
+                saveAsFileConsumer.accept(file);
+
+            } else {
+                System.out.println("No file saved");
+            }
+        });
 
         exitItem.addActionListener(e -> System.exit(0));
     }

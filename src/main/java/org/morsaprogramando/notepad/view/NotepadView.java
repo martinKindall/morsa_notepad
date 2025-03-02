@@ -3,6 +3,7 @@ package org.morsaprogramando.notepad.view;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -11,7 +12,8 @@ public class NotepadView {
     private TextEditorView textEditorView;
     private MenuView menuView;
 
-    public NotepadView(Function<File, String> fileStringFunction, Consumer<String> saveFileConsumer) {
+    public NotepadView(Function<File, String> fileStringFunction, Consumer<String> saveFileConsumer,
+                       BiConsumer<File, String> saveAsFileConsumer) {
         // Initialize the components
         frame = new JFrame("Morsa's notepad");
         textEditorView = new TextEditorView();
@@ -22,6 +24,8 @@ public class NotepadView {
         }), () -> {
             String fileContent = textEditorView.getText();
             saveFileConsumer.accept(fileContent);
+        }, file -> {
+            saveAsFileConsumer.accept(file, textEditorView.getText());
         });
 
         // Set the frame layout

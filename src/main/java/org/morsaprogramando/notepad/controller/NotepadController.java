@@ -6,6 +6,7 @@ import org.morsaprogramando.notepad.view.NotepadView;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -38,8 +39,18 @@ public enum NotepadController {
             }
         };
 
+        BiConsumer<File, String> saveAsFileConsumer = (file, content) -> {
+            currentFile = file;
+
+            try {
+                fileService.saveFile(file, content);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
         SwingUtilities.invokeLater(() -> {
-            NotepadView notepadView = new NotepadView(openFileConsumer, saveFileConsumer);
+            NotepadView notepadView = new NotepadView(openFileConsumer, saveFileConsumer, saveAsFileConsumer);
             notepadView.show();
         });
     }

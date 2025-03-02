@@ -19,6 +19,10 @@ public enum NotepadController {
     public void run() {
         FileService fileService = new FileService();
 
+        Runnable newItemRunnable = () -> {
+            currentFile = null;
+        };
+
         Function<File, String> openFileConsumer = (file) -> {
             try {
                 currentFile = file;
@@ -50,7 +54,8 @@ public enum NotepadController {
         };
 
         SwingUtilities.invokeLater(() -> {
-            NotepadView notepadView = new NotepadView(openFileConsumer, saveFileConsumer, saveAsFileConsumer);
+            NotepadView notepadView = new NotepadView(newItemRunnable, openFileConsumer,
+                    saveFileConsumer, saveAsFileConsumer);
             notepadView.show();
         });
     }

@@ -8,16 +8,19 @@ import java.util.function.Consumer;
 
 public class MenuView {
     private JMenuBar menuBar;
+    private final JMenuItem newItem;
     private final JMenuItem openItem;
     private final JMenuItem saveItem;
     private final JMenuItem saveAsItem;
     private final JMenuItem exitItem;
 
+    private final Runnable newItemRunnable;
     private final Consumer<File> openFileConsumer;
     private final Runnable saveRunnable;
     private final Consumer<File> saveAsFileConsumer;
 
-    public MenuView(Consumer<File> openFileConsumer, Runnable saveRunnable, Consumer<File> saveAsFileConsumer) {
+    public MenuView(Runnable newItemRunnable, Consumer<File> openFileConsumer, Runnable saveRunnable, Consumer<File> saveAsFileConsumer) {
+        this.newItemRunnable = newItemRunnable;
         this.openFileConsumer = openFileConsumer;
         this.saveRunnable = saveRunnable;
         this.saveAsFileConsumer = saveAsFileConsumer;
@@ -27,11 +30,13 @@ public class MenuView {
 
         JMenu fileMenu = new JMenu("File");
 
+        newItem = new JMenuItem("New");
         openItem = new JMenuItem("Open");
         saveItem = new JMenuItem("Save");
         saveAsItem = new JMenuItem("Save As");
         exitItem = new JMenuItem("Exit");
 
+        fileMenu.add(newItem);
         fileMenu.add(openItem);
         fileMenu.add(saveItem);
         fileMenu.add(saveAsItem);
@@ -87,6 +92,9 @@ public class MenuView {
     }
 
     private void initMenuItems() {
+
+        newItem.addActionListener(e -> newItemRunnable.run());
+
         openItem.addActionListener(e -> {
             File file = openFile();
 

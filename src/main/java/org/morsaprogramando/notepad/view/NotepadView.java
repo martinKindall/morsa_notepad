@@ -12,21 +12,22 @@ public class NotepadView {
     private TextEditorView textEditorView;
     private MenuView menuView;
 
-    public NotepadView(Function<File, String> fileStringFunction, Consumer<String> saveFileConsumer,
+    public NotepadView(Runnable newItemRunnable, Function<File, String> fileStringFunction, Consumer<String> saveFileConsumer,
                        BiConsumer<File, String> saveAsFileConsumer) {
         // Initialize the components
         frame = new JFrame("Morsa's notepad");
         textEditorView = new TextEditorView();
 
-        menuView = new MenuView((file -> {
+        menuView = new MenuView(() -> {
+            newItemRunnable.run();
+            textEditorView.setText("");
+        }, (file -> {
             String fileContent = fileStringFunction.apply(file);
             textEditorView.setText(fileContent);
         }), () -> {
             String fileContent = textEditorView.getText();
             saveFileConsumer.accept(fileContent);
-        }, file -> {
-            saveAsFileConsumer.accept(file, textEditorView.getText());
-        });
+        }, file -> saveAsFileConsumer.accept(file, textEditorView.getText()));
 
         // Set the frame layout
         frame.setLayout(new BorderLayout());

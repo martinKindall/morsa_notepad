@@ -7,37 +7,35 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public enum NotepadController {
     INSTANCE;
 
     private File currentFile;
-    private boolean lastChangesSaved = true;
 
     public void run() {
-        FileService fileService = new FileService();
-
-        Runnable newItemRunnable = () -> {
-            currentFile = null;
-        };
+        Runnable newItemRunnable = () -> currentFile = null;
 
         Function<File, String> openFileConsumer = (file) -> {
             try {
                 currentFile = file;
 
-                return fileService.readFile(file);
+                return FileService.INSTANCE.readFile(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
 
-        Consumer<String> saveFileConsumer = (String content) -> {
-            try {
-                if (currentFile == null || content == null) return;
+        Function<String, Boolean> saveFileNotFound = (String content) -> {
+            if (currentFile == null) {
+                return true;
+            }
 
-                fileService.saveFile(currentFile, content);
+            try {
+                FileService.INSTANCE.saveFile(currentFile, content);
+                return false;
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -47,7 +45,7 @@ public enum NotepadController {
             currentFile = file;
 
             try {
-                fileService.saveFile(file, content);
+                FileService.INSTANCE.saveFile(file, content);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -55,7 +53,7 @@ public enum NotepadController {
 
         SwingUtilities.invokeLater(() -> {
             NotepadView notepadView = new NotepadView(newItemRunnable, openFileConsumer,
-                    saveFileConsumer, saveAsFileConsumer);
+                    saveFileNotFound, saveAsFileConsumer);
             notepadView.show();
         });
     }

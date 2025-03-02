@@ -3,7 +3,8 @@ package org.morsaprogramando.notepad.service;
 import java.io.*;
 import java.util.Objects;
 
-public class FileService {
+public enum FileService {
+    INSTANCE;
 
     public String readFile(File file) throws IOException {
         StringBuilder content = new StringBuilder();

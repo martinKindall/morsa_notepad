@@ -4,12 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TextEditorView {
-    private JTextArea textArea;
-    private JScrollPane scrollPane;
+    private final JTextArea textArea;
+    private final JScrollPane scrollPane;
 
-    /**
-     * Constructs the TextEditorView and initializes the JTextArea.
-     */
     public TextEditorView() {
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
@@ -19,12 +16,6 @@ public class TextEditorView {
         scrollPane = new JScrollPane(textArea);
     }
 
-    /**
-     * Returns the JScrollPane containing the JTextArea.
-     * This is useful for embedding into the main application view.
-     *
-     * @return JScrollPane with the text editor.
-     */
     public JScrollPane getScrollPane() {
         return scrollPane;
     }
@@ -47,9 +38,6 @@ public class TextEditorView {
         textArea.setText(text);
     }
 
-    /**
-     * Clears the text in the editor.
-     */
     public void clear() {
         textArea.setText("");
     }

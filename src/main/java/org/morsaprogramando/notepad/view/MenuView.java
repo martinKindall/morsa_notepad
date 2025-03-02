@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class MenuView {
-    private JMenuBar menuBar;
+    private final JMenuBar menuBar;
     private final JMenuItem newItem;
     private final JMenuItem openItem;
     private final JMenuItem saveItem;
@@ -19,7 +19,8 @@ public class MenuView {
     private final Runnable saveRunnable;
     private final Consumer<File> saveAsFileConsumer;
 
-    public MenuView(Runnable newItemRunnable, Consumer<File> openFileConsumer, Runnable saveRunnable, Consumer<File> saveAsFileConsumer) {
+    public MenuView(Runnable newItemRunnable, Consumer<File> openFileConsumer,
+                    Runnable saveRunnable, Consumer<File> saveAsFileConsumer) {
         this.newItemRunnable = newItemRunnable;
         this.openFileConsumer = openFileConsumer;
         this.saveRunnable = saveRunnable;
@@ -52,20 +53,19 @@ public class MenuView {
         return menuBar;
     }
 
-    private File openFile() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text files (*.txt)", "txt"));
+    public void saveFileHandler() {
+        File file = saveFileChooser();
 
-        int result = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            System.out.println("Selected file for saving: " + file.getAbsolutePath());
+            saveAsFileConsumer.accept(file);
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            return fileChooser.getSelectedFile();
+        } else {
+            System.out.println("No file saved");
         }
-
-        return null;
     }
 
-    public File saveFile() {
+    private File saveFileChooser() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Text files (*.txt)", "txt"));
 
@@ -74,7 +74,6 @@ public class MenuView {
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
 
-            // Ensure the file has a .txt extension
             if (!selectedFile.getName().toLowerCase().endsWith(".txt")) {
                 selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
             }
@@ -91,12 +90,25 @@ public class MenuView {
         return null;
     }
 
+    private File openFileChooser() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text files (*.txt)", "txt"));
+
+        int result = fileChooser.showOpenDialog(null);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }
+
+        return null;
+    }
+
     private void initMenuItems() {
 
         newItem.addActionListener(e -> newItemRunnable.run());
 
         openItem.addActionListener(e -> {
-            File file = openFile();
+            File file = openFileChooser();
 
             if (file != null) {
                 System.out.println("Selected file: " + file.getAbsolutePath());
@@ -109,17 +121,7 @@ public class MenuView {
 
         saveItem.addActionListener(e -> saveRunnable.run());
 
-        saveAsItem.addActionListener(e -> {
-            File file = saveFile();
-
-            if (file != null) {
-                System.out.println("Selected file for saving: " + file.getAbsolutePath());
-                saveAsFileConsumer.accept(file);
-
-            } else {
-                System.out.println("No file saved");
-            }
-        });
+        saveAsItem.addActionListener(e -> saveFileHandler());
 
         exitItem.addActionListener(e -> System.exit(0));
     }

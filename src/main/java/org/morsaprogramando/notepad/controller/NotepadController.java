@@ -1,5 +1,6 @@
 package org.morsaprogramando.notepad.controller;
 
+import org.morsaprogramando.notepad.model.NotepadModel;
 import org.morsaprogramando.notepad.service.FileService;
 import org.morsaprogramando.notepad.view.NotepadView;
 
@@ -12,14 +13,19 @@ import java.util.function.Function;
 public enum NotepadController {
     INSTANCE;
 
-    private File currentFile;
+    private NotepadModel notepadModel = new NotepadModel();
 
     public void run() {
-        Runnable newItemRunnable = () -> currentFile = null;
+        Runnable newItemRunnable = () -> notepadModel = null;
 
         Function<File, String> openFileConsumer = (file) -> {
+            if (!notepadModel.getLastChangesSaved()) {
+                // TODO: open dialog to confirm if changes should be ignored
+            }
+
             try {
-                currentFile = file;
+                notepadModel.setCurrentFile(file);
+                notepadModel.setLastChangesSaved(true);
 
                 return FileService.INSTANCE.readFile(file);
             } catch (IOException e) {
@@ -28,12 +34,12 @@ public enum NotepadController {
         };
 
         Function<String, Boolean> saveFileNotFound = (String content) -> {
-            if (currentFile == null) {
+            if (notepadModel.getCurrentFile() == null) {
                 return true;
             }
 
             try {
-                FileService.INSTANCE.saveFile(currentFile, content);
+                FileService.INSTANCE.saveFile(notepadModel.getCurrentFile(), content);
                 return false;
 
             } catch (IOException e) {
@@ -42,7 +48,8 @@ public enum NotepadController {
         };
 
         BiConsumer<File, String> saveAsFileConsumer = (file, content) -> {
-            currentFile = file;
+            notepadModel.setCurrentFile(file);
+            notepadModel.setLastChangesSaved(true);
 
             try {
                 FileService.INSTANCE.saveFile(file, content);

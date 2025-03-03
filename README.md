@@ -11,7 +11,7 @@ Minimalistic notepad made with Java Swing.
 
 Works preferably with text files.
 
-#### TODO
+#### Next Release features
 
 - Update the model if there are unsaved changes.
 - Pop up a dialog before opening a file if there are unsaved changes.

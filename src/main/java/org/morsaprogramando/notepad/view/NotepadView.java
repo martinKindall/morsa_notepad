@@ -1,5 +1,7 @@
 package org.morsaprogramando.notepad.view;
 
+import org.morsaprogramando.notepad.model.NotepadModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -7,14 +9,16 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class NotepadView {
+    private final NotepadModel notepadModel;
     private final JFrame frame;
     private final TextEditorView textEditorView;
     private final MenuView menuView;
 
-    public NotepadView(Runnable newItemRunnable, Function<File, String> fileStringFunction,
+    public NotepadView(NotepadModel notepadModel, Runnable newItemRunnable, Function<File, String> fileStringFunction,
                        Function<String, Boolean> saveFileFunction,
                        BiConsumer<File, String> saveAsFileConsumer) {
 
+        this.notepadModel = notepadModel;
         frame = new JFrame("Morsa's notepad");
         textEditorView = new TextEditorView();
 
@@ -41,6 +45,11 @@ public class NotepadView {
             newItemRunnable.run();
             textEditorView.clear();
         }, (file -> {
+
+            if (!notepadModel.getLastChangesSaved()) {
+                // TODO: open dialog to confirm if changes should be ignored
+            }
+
             String fileContent = getFileContent.apply(file);
             textEditorView.setText(fileContent);
         }), () -> {

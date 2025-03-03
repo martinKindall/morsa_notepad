@@ -19,10 +19,6 @@ public enum NotepadController {
         Runnable newItemRunnable = () -> notepadModel = null;
 
         Function<File, String> openFileConsumer = (file) -> {
-            if (!notepadModel.getLastChangesSaved()) {
-                // TODO: open dialog to confirm if changes should be ignored
-            }
-
             try {
                 notepadModel.setCurrentFile(file);
                 notepadModel.setLastChangesSaved(true);
@@ -59,7 +55,9 @@ public enum NotepadController {
         };
 
         SwingUtilities.invokeLater(() -> {
-            NotepadView notepadView = new NotepadView(newItemRunnable, openFileConsumer,
+            NotepadView notepadView = new NotepadView(
+                    notepadModel,
+                    newItemRunnable, openFileConsumer,
                     saveFileNotFound, saveAsFileConsumer);
             notepadView.show();
         });

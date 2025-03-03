@@ -14,6 +14,8 @@ public class TextEditorView {
         textArea.setWrapStyleWord(true);
 
         scrollPane = new JScrollPane(textArea);
+
+        // TODO: if the textArea changes, notify the controller to update the model for unsaved changes.
     }
 
     public JScrollPane getScrollPane() {
